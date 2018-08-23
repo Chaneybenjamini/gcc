@@ -600,6 +600,7 @@ languages = { language=go;	gcc-check-target=check-go;
 				lib-check-target=check-gotools; };
 languages = { language=brig;	gcc-check-target=check-brig;
 				lib-check-target=check-target-libhsail-rt; };
+languages = { language=brainfuck gcc-check-target=check-brainfuck; };
 
 // Toplevel bootstrap
 bootstrap_stage = { id=1 ; };

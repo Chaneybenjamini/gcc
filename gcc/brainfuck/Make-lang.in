@@ -1,0 +1,126 @@
+# Top level -*- makefile -*- fragment for brainfuck
+#   Copyright (C) 2016 Free Software Foundation, Inc.
+
+#This file is part of GCC.
+
+#GCC is free software; you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation; either version 3, or (at your option)
+#any later version.
+
+#GCC is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with GCC; see the file COPYING3.  If not see
+# <http://www.gnu.org/licenses/>.
+
+# This file provides the language dependent support in the main Makefile.
+# Each language makefile fragment must provide the following targets:
+#
+# foo.all.cross, foo.start.encap, foo.rest.encap,
+# foo.install-common, foo.install-man, foo.install-info, foo.install-pdf,
+# foo.install-html, foo.info, foo.dvi, foo.pdf, foo.html, foo.uninstall,
+# foo.mostlyclean, foo.clean, foo.distclean,
+# foo.maintainer-clean, foo.stage1, foo.stage2, foo.stage3, foo.stage4
+#
+# where `foo' is the name of the language.
+#
+# It should also provide rules for:
+#
+# - making any compiler driver (eg: g++)
+# - the compiler proper (eg: cc1plus)
+# - define the names for selecting the language in LANGUAGES.
+
+
+GCCBF_INSTALL_NAME := $(shell echo gccbf|sed '$(program_transform_name)')
+GCCBF_TARGET_INSTALL_NAME := $(target_noncanonical)-$(shell echo gccbf|sed '$(program_transform_name)')
+
+brainfuck: bf1$(exeext)
+
+.PHONY: brainfuck
+
+# Driver
+
+GCCBF_OBJS = \
+	$(GCC_OBJS) \
+	brainfuck/bfspec.o \
+	$(END)
+
+gccbf$(exeext): $(GCCBF_OBJS) $(EXTRA_GCC_OBJS) libcommon-target.a $(LIBDEPS)
+	+$(LINKER) $(ALL_LINKERFLAGS) $(LDFLAGS) -o $@ \
+	$(GCCBF_OBJS) $(EXTRA_GCC_OBJS) libcommon-target.a \
+	$(EXTRA_GCC_LIBS) $(LIBS)
+
+# The compiler proper
+
+bf_OBJS = \
+	brainfuck/bf1.o \
+	$(END)
+
+bf1$(exeext): attribs.o $(bf_OBJS) $(BACKEND) $(LIBDEPS)
+	+$(LLINKER) $(ALL_LINKERFLAGS) $(LDFLAGS) -o $@ \
+	attribs.o $(bf_OBJS) $(BACKEND) $(LIBS) $(BACKENDLIBS)
+
+# FIXME
+brainfuck.all.cross:
+
+brainfuck.start.encap: gccbf$(exeext)
+
+brainfuck.rest.encap:
+
+# FIXME
+brainfuck.install-common: installdirs
+	-rm -f $(DESTDIR)$(bindir)/$(GCCBF_INSTALL_NAME)$(exeext)
+	$(INSTALL_PROGRAM) gccbf$(exeext) $(DESTDIR)$(bindir)/$(GCCBF_INSTALL_NAME)$(exeext)
+	rm -f $(DESTDIR)$(bindir)/$(GCCBF_TARGET_INSTALL_NAME)$(exeext); \
+	( cd $(DESTDIR)$(bindir) && \
+	$(LN) $(GCCBF_INSTALL_NAME)$(exeext) $(GCCBF_TARGET_INSTALL_NAME)$(exeext) ); \
+ 
+brainfuck.install-man:
+
+brainfuck.install-info:
+
+brainfuck.install-pdf:
+
+brainfuck.install-plugin:
+
+brainfuck.install-html:
+
+brainfuck.info:
+
+brainfuck.dvi:
+
+brainfuck.pdf:
+
+brainfuck.html:
+
+brainfuck.uninstall:
+	-rm -f gccbf$(exeext) bf1$(exeext)
+	-rm -f $(bf_OBJS)
+
+brainfuck.man:
+
+brainfuck.mostlyclean:
+
+brainfuck.clean:
+
+brainfuck.distclean:
+
+brainfuck.maintainer-clean:
+
+# The main makefile has already created stage?/brainfuck.
+brainfuck.stage1: stage1-start
+	-mv brainfuck/*$(objext) stage1/brainfuck
+brainfuck.stage2: stage2-start
+	-mv brainfuck/*$(objext) stage2/brainfuck
+brainfuck.stage3: stage3-start
+	-mv brainfuck/*$(objext) stage3/brainfuck
+brainfuck.stage4: stage4-start
+	-mv brainfuck/*$(objext) stage4/brainfuck
+brainfuck.stageprofile: stageprofile-start
+	-mv brainfuck/*$(objext) stageprofile/brainfuck
+brainfuck.stagefeedback: stagefeedbac-start
+	-mv brainfuck/*$(objext) stagefeedback/brainfuck
